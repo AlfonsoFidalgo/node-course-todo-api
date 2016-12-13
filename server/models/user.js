@@ -12,15 +12,13 @@ var UserSchema = new mongoose.Schema({
     minlength: 1,
     unique: true,
     validate: {
-      validator: (value) => {
-        return validator.isEmail(value);
-      },
+      validator: validator.isEmail,
       message: '{VALUE} is not a valid email'
     }
   },
   password: {
     type: String,
-    required: true,
+    require: true,
     minlength: 6
   },
   tokens: [{
@@ -42,16 +40,12 @@ UserSchema.methods.toJSON = function () {
   return _.pick(userObject, ['_id', 'email']);
 };
 
-UserSchema.methods.generateAuthToken = function (){
+UserSchema.methods.generateAuthToken = function () {
   var user = this;
   var access = 'auth';
-  var token = jwt.sign({_id: user._id.toHexString(), access}, 'abc123')
-  .toString();
+  var token = jwt.sign({_id: user._id.toHexString(), access}, 'abc123').toString();
 
-  user.tokens.push({
-    access,
-    token
-  });
+  user.tokens.push({access, token});
 
   return user.save().then(() => {
     return token;
@@ -65,10 +59,7 @@ UserSchema.statics.findByToken = function (token) {
   try {
     decoded = jwt.verify(token, 'abc123');
   } catch (e) {
-    return new Promise((resolve, reject) => {
-      reject();
-    });
-    //return Promise.reject() (equivalent to above)
+    return Promise.reject();
   }
 
   return User.findOne({
@@ -78,20 +69,21 @@ UserSchema.statics.findByToken = function (token) {
   });
 };
 
-UserSchema.pre('save', function (next){
+UserSchema.pre('save', function (next) {
   var user = this;
+
   if (user.isModified('password')) {
     bcrypt.genSalt(10, (err, salt) => {
       bcrypt.hash(user.password, salt, (err, hash) => {
         user.password = hash;
         next();
-      })
+      });
     });
   } else {
-
+    next();
   }
 });
 
 var User = mongoose.model('User', UserSchema);
 
-module.exports = {User};
+module.exports = {User}

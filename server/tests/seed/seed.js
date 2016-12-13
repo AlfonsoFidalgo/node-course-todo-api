@@ -1,14 +1,14 @@
 const {ObjectID} = require('mongodb');
 const jwt = require('jsonwebtoken');
+
 const {Todo} = require('./../../models/todo');
 const {User} = require('./../../models/user');
 
 const userOneId = new ObjectID();
 const userTwoId = new ObjectID();
-
 const users = [{
   _id: userOneId,
-  email: 'fons@gmail.com',
+  email: 'andrew@example.com',
   password: 'userOnePass',
   tokens: [{
     access: 'auth',
@@ -16,13 +16,13 @@ const users = [{
   }]
 }, {
   _id: userTwoId,
-  email: 'user2@gmail.com',
+  email: 'jen@example.com',
   password: 'userTwoPass'
 }];
 
 const todos = [{
   _id: new ObjectID(),
-  text: 'Fisrt test todo'
+  text: 'First test todo'
 }, {
   _id: new ObjectID(),
   text: 'Second test todo',
